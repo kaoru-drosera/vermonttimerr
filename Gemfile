@@ -5,9 +5,14 @@ ruby '3.0.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.1.1'
+# 本体
+gem 'timers'
+#タイマー機能
+gem 'carrierwave'
 gem 'image_processing'
 gem 'mini_magick'
 gem 'active_storage_validations'
+# 画像投稿いちれん
 gem 'bcrypt'
 gem 'faker'
 #ダミーユーザー作成
