@@ -1,7 +1,10 @@
 require 'timers'
 
 t = Time.new(0)
-countdown_time_in_seconds = 300 # change this value
+sec = 30 # change this value 0-59
+min = 0 * 60 # change foward value 0-59
+
+countdown_time_in_seconds = sec + min # change this value
 
 puts t + countdown_time_in_seconds
 
