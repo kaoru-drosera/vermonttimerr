@@ -2,3 +2,412 @@
 <h1>StaticPages#home</h1>
 <p>Find me in app/views/static_pages/home.html.erb</p>
 <p><%= link_to "Sign up now!", signup_path %></p>
+
+<div id="mainArea">
+
+  <div class='block1'>
+      <div class='blockA'>
+          <input type='text' value='0' id='d0' class='setNum' readonly onclick='chgSign()'><br />
+          <input type='button' value='7' id='k7' class='numKey' onclick='setNum(7)'><input type='button' value='8' id='k8' class='numKey' onclick='setNum(8)'><input type='button' value='9' id='k9' class='numKey' onclick='setNum(9)'><br />
+          <input type='button' value='4' id='k4' class='numKey' onclick='setNum(4)'><input type='button' value='5' id='k5' class='numKey' onclick='setNum(5)'><input type='button' value='6' id='k6' class='numKey' onclick='setNum(6)'><br />
+          <input type='button' value='1' id='k1' class='numKey' onclick='setNum(1)'><input type='button' value='2' id='k2' class='numKey' onclick='setNum(2)'><input type='button' value='3' id='k3' class='numKey' onclick='setNum(3)'><br />
+          <input type='button' value='0' id='k0' class='numKey' onclick='setNum(0)'><input type='button' value='.' id='kp' class='numKey' onclick='setNum(".")'><input type='button' value='C' id='kr' class='numKey clearButton' onclick='reset()'><br />
+
+          <input type='button' value='時間' class='numKey timeButton' onclick='addTotal("h")' id='kh'><input type='button' value='分' class='numKey timeButton' onclick='addTotal("m")' id='km'><input type='button' value='秒' class='numKey timeButton' onclick='addTotal("s")' id='ks'>
+      </div>
+      <br />
+      <div class='blockB'>
+          <input type='text' value='0:00:00.0' id='d1' class='progressTime' readonly>
+
+          <div id='progressArea'>
+              <span id='progressBar'></span>
+          </div>
+
+          <span class='buttonArea'>
+              <input type='button' value='リセット' id='kac' class='resetButton' onclick='allClear()'>
+              <input type='button' value='スタート' id='kss' class='startButton' onclick='countStart()'>
+          </span>
+
+      </div>
+  </div>
+
+  <input type='button' value='' id='krs' class='resumeButton'>
+
+  <input type='button' id='dummy' style='position: fixed; opacity: 0;'>
+</div><!-- #mainArea  -->
+
+
+<script type="text/javascript">
+
+  'use strict';
+
+  let totalSec = 0;
+  let allTotalSec = 0;
+  let countDownSec = 0;
+  let startMs = 0;
+  let countId;
+  let endId;
+  let onKeyFlg = 0;
+  let sign = 1;
+
+  const d = function(id) { return document.getElementById(id);}
+
+  const seList = {
+      seClick : 'sound/click.mp3',
+      seAlarm : 'sound/alarm.mp3',
+  };
+
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioContext = (window.AudioContext !== undefined) ? new AudioContext() : undefined;
+
+  const getAudioBuffer = function(url, fn) {
+      const req = new XMLHttpRequest();
+      req.responseType = 'arraybuffer';
+      req.onreadystatechange = function() {
+          if (req.readyState === 4) {
+              if (req.status === 0 || req.status === 200) {
+                  audioContext.decodeAudioData(req.response, function(buffer) {
+                      fn(buffer);
+                  });
+              }
+          }
+      };
+      req.open('GET', url, true);
+      req.send('');
+  };
+
+  const playSound = function(buffer) {
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      source.start(0);
+  };
+
+  if(window.AudioContext === undefined) {
+      let audioTag = '';
+      for(let i in seList) {
+          audioTag +=
+              '<audio id="' + i + '" preload="auto">'+
+              '   <source src="' + seList[i] + '" type="audio/mp3">'+
+              '</audio>';
+      }
+      document.write(audioTag);
+  }
+
+  function se(id) {
+      if(audioContext !== undefined){
+          document.getElementById(id).onclick();
+      } else {
+          if(id) {
+              const _d = document.getElementById(id);
+              if(_d.currentTime != 0 || !_d.paused){
+                  _d.pause();
+                  _d.currentTime = 0;
+              }
+              _d.play();
+          }
+      }
+  }
+
+  // ロード時処理
+  window.onload = function() {
+      if(audioContext !== undefined) {
+          for(let i in seList) {
+              getAudioBuffer(seList[i], function(buffer) {
+                  const bufId = i;
+                  document.querySelector('body').appendChild(document.createElement("div"));
+                  document.querySelector('body>div:last-of-type').id = bufId;
+                  document.getElementById(bufId).onclick = function() {
+                      playSound(buffer);
+                  };
+              });
+          }
+      }
+
+      // 画面スワイプによる引きずり防止
+      document.addEventListener("touchmove", function(event) {
+          event.preventDefault();
+      }, { passive: false });
+
+      // localStorageからパラメータ取得
+      const storage = localStorage.getItem('timer_params');
+      const params = storage !== null ? JSON.parse(storage) : {};
+
+      // 動作中であれば確認画面表示
+      // (Web Audio Apiで音を出すための初回アプローチも兼ねる)
+      if(params.allTotalSec !== undefined && params.allTotalSec > 0) {
+          // storageから取得した値で更新
+          allTotalSec = params.allTotalSec;
+          totalSec = params.totalSec;
+          startMs = params.startMs;
+
+          // 確認画面(実体は全画面拡大したボタン)表示
+          d('krs').style.display = 'block';
+
+          // 確認画面の内容更新インターバル
+          const tmpId = setInterval(function() {
+              let progressSec = (Date.now() - startMs) / 1000;
+              countDownSec = params.pause !== undefined ?
+                  totalSec :
+                  totalSec - progressSec;
+              if(countDownSec <= 0) {
+                  clearInterval(tmpId);
+                  keyEventSet();
+                  d('krs').style.display = 'none';
+                  allTotalSec =
+                  totalSec =
+                  startMs = 0;
+                  localStorage.removeItem('timer_params');
+              }
+              d('krs').value =
+                  (params.pause !== undefined ? '一時停止中 ' : '') +
+                  timeString(countDownSec) + '：画面を' +
+                  (window.ontouchstart !== undefined ? 'タップ' : 'クリック') +'で復帰できます';
+          }, 100);
+
+          // 確認画面クリック
+          d('krs').addEventListener('click', function() {
+              clearInterval(tmpId);
+              keyEventSet();
+              d('krs').style.display = 'none';
+              let progressSec = (Date.now() - startMs) / 1000;
+              countDownSec = params.pause !== undefined ?
+                  totalSec :
+                  totalSec - progressSec;
+
+              if(countDownSec > 0) {
+                  se('seClick');
+                  if(params.pause !== undefined) {
+                      d('d1').value = timeString(totalSec) + '.' +
+                          (totalSec % 1).toFixed(1).slice(-1);
+                  } else {
+                      d('kss').value = 'ストップ';
+                      countId = setInterval('progressCount()', 25);
+                  }
+              }
+          }, false);
+      } else {
+          keyEventSet();
+      }
+  };
+
+  // 入力プレビューに値設定
+  function setNum(n) {
+      let d0 = d('d0').value;
+      if(n == '.' && d0.match(/\./)) return;
+
+      d0 += String(n);
+      d0 = d0.replace(/^-/, '')
+             .replace(/^0+$/, '0')
+             .replace(/^(\.)/, '0.')
+             .replace(/^0(\d+)/, "$1");
+
+      d('d0').value = (sign > 0 ? '' : '-') + d0;
+      se('seClick');
+  }
+
+  // 入力プレビュークリア
+  function reset() {
+      d('d0').value = '0';
+      if(sign < 0) chgSign();
+      se('seClick');
+  }
+
+  // 時間追加
+  function addTotal(m) {
+      const d0 = d('d0').value.replace(/^[\D]/, '');
+
+      let plusSec = 0;
+      if(m == 'h') {
+          plusSec = Math.floor(d0 * 3600);
+      } else if(m == 'm') {
+          plusSec = Math.floor(d0 * 60);
+      } else {
+          plusSec = Math.floor(d0 * 10) / 10;
+      }
+
+      if(sign < 0 && plusSec > totalSec) plusSec = totalSec;
+      totalSec += (plusSec * sign);
+      allTotalSec += (plusSec * sign);
+
+      const params = {
+          allTotalSec: allTotalSec,
+          totalSec: totalSec,
+          startMs: startMs,
+      };
+      if(!countId) params.pause = 1;
+      localStorage.setItem('timer_params', JSON.stringify(params));
+
+      d('d0').value = '0';
+      const parsent = totalSec / allTotalSec * 100;
+
+      se('seClick');
+
+      if(sign < 0) chgSign();
+
+      if(countId) return;
+      d('progressBar').style.width = parsent + '%';
+
+      const dH = Math.floor(totalSec / 3600);
+      const dM = Math.floor(totalSec / 60) % 60;
+      const dS = Math.floor(totalSec % 60);
+      d('d1').value =
+          dH + ':' +
+          ('0' + dM).substr(-2) + ':' +
+          ('0' + dS).substr(-2) + '.' +
+          (totalSec % 1).toFixed(1).slice(-1);
+  }
+
+  // 符号反転
+  function chgSign() {
+      sign *= -1;
+      d('d0').style.background = sign === 1 ? '' : '#ff0000';
+      d('d0').style.color = sign === 1 ? '' : '#ffffff';
+      d('d0').value = (sign > 0 ? '' : '-') + d('d0').value.replace(/^-/, '');
+  }
+
+  // 設定済み時間をクリア
+  function allClear() {
+      totalSec = 0;
+      allTotalSec = 0;
+
+      d('d0').value = '0';
+      d('d1').value = '0:00:00.0';
+      d('progressBar').style.width = '0px';
+      if(sign < 0) chgSign();
+
+      localStorage.removeItem('timer_params');
+      // 動作中だった場合は解除
+      if(countId) {
+          clearInterval(countId);
+          countId = '';
+          d('kss').value = 'スタート';
+      }
+  }
+
+  // カウント開始/停止処理
+  function countStart() {
+      if(totalSec <= 0) return;
+      se('seClick');
+
+      if(countId) {
+          clearInterval(countId);
+          countId = '';
+          totalSec -= ((Date.now() - startMs) / 1000 );
+          d('kss').value = 'スタート';
+          localStorage.setItem('timer_params', JSON.stringify({
+              allTotalSec: allTotalSec,
+              totalSec: totalSec,
+              startMs: startMs,
+              pause: 1,
+          }));
+          return;
+      }
+
+      d('kss').value = 'ストップ';
+      startMs = Date.now();
+      if(!countId) countId = setInterval('progressCount()', 25);
+
+      localStorage.setItem('timer_params', JSON.stringify({
+          allTotalSec: allTotalSec,
+          totalSec: totalSec,
+          startMs: startMs,
+      }));
+  }
+
+  // カウントダウン表示処理
+  function progressCount() {
+      const progressSec = (Date.now() - startMs) / 1000;
+
+      countDownSec = totalSec - progressSec;
+      d('d1').value =
+          timeString(countDownSec) + '.'+ (countDownSec % 1).toFixed(1).slice(-1);
+
+      const parsent = (totalSec - progressSec) / allTotalSec * 100;
+      d('progressBar').style.width = parsent + '%';
+
+      // 設定時間に達したらインターバル解除してタイムアップ処理へ
+      if(countDownSec <= 0) {
+          clearInterval(countId);
+          countId = '';
+          d('kss').value = 'スタート';
+          d('progressBar').style.width = '0px';
+          totalSec = 0;
+          allTotalSec = 0;
+          d('d1').value = '0:00:00.0';
+          timeUp();
+      }
+  }
+
+  // 時間表示用文字列生成
+  function timeString(sec) {
+      sec = Math.floor(sec);
+      return Math.floor(sec / 3600) + ':' +
+          ('0'+ Math.floor(sec / 60) % 60).slice(-2) + ':' +
+          ('0' + (sec % 60)).slice(-2);
+  }
+
+  // タイムアップ
+  function timeUp() {
+      localStorage.removeItem('timer_params');
+      se('seAlarm');
+      endId = setInterval('alarm()', 1000);
+  }
+
+  // アラーム
+  function alarm() {
+      if(window.ontouchstart === undefined) {
+          document.onmousedown = function(e) {
+              if(e.type == 'mousedown') {
+                  if(endId) clearInterval(endId);
+                  return;
+              }
+          }
+      } else {
+          d('mainArea').ontouchstart = function() {
+              if(endId) clearInterval(endId);
+              return;
+          }
+      }
+      se('seAlarm');
+  }
+
+  // キーボードからの入力対応
+  function keyEventSet() {
+      document.onkeydown = function(e) {
+          d('dummy').focus();
+
+          // キーリピートによる連打防止
+          if(onKeyFlg) return;
+          onKeyFlg = 1;
+
+          const kcode =
+              (window.event !== undefined) ? event.keyCode : e.which;
+
+          // 0 ～ 9
+          if(kcode >= 48 && kcode <= 57) setNum(kcode - 48);
+          if(kcode >= 96 && kcode <= 105) setNum(kcode - 96);
+          // .
+          else if(kcode === 190 || kcode === 110) setNum('.');
+          // c bs del
+          else if(kcode === 67 || kcode === 8 || kcode === 46) reset();
+
+          // h:72 m:77 s:83
+          else if(kcode === 72) addTotal('h');
+          else if(kcode === 77 || kcode === 107) addTotal('m');
+          else if(kcode === 83) addTotal('s');
+
+          // r:82 esc:27
+          else if(kcode === 82 || kcode == 27) allClear();
+
+          // enter:13 space:32
+          else if(kcode === 13 || kcode == 32) countStart();
+      }
+
+      document.onkeyup = function() {
+          onKeyFlg = 0;
+      }
+  }
+
+</script>
+<audio src="alert.mp3" loop id="audio">現環境では終了時にアラームが鳴りません</audio>
