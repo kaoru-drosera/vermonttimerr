@@ -1,0 +1,11 @@
+<li id="timerpost-<%= timerpost.id %>">
+  <span class="user"><%= link_to timerpost.user.name, timerpost.user %></span>
+  <span class="hour"><%= timerpost.hour %></span>
+  <span class="minutes"><%= timerpost.minutes %></span>
+  <span class="second"><%= timerpost.second %></span>
+  <span class="memo"><%= timerpost.memo %></span>
+  <span class="post-timestamp">Posted <%= time_ago_in_words(timerpost.created_at) %> ago</span>
+  <% if current_user?(timerpost.user) %>
+    <%= link_to "delete", timerpost, method: :delete, data:{confirm:"you sure?"} %>
+  <% end %>
+</li><!-- #micropost-  -->

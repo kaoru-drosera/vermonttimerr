@@ -9,6 +9,15 @@ User.create!(name:'Example User', email: 'example@railstutorial.org.com', passwo
   User.create!(name: name, email: email, password: password, password_confirmation: password)
 end
 
+# ユーザーの一部を対象に投稿を追加する
+users = User.order(:created_at).take(6)
+50.times do
+  hour = Faker::Number.between(from:0, to:59)
+  minutes = Faker::Number.between(from:0, to:59)
+  second = Faker::Number.between(from:0, to:59)
+  users.each{|user| user.timerposts.create!(hour: hour, minutes: minutes, second: second)}
+end
+
 
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).

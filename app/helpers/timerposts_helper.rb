@@ -1,0 +1,2 @@
+module TimerpostsHelper
+end

@@ -11,7 +11,9 @@ class UsersController < ApplicationController
   end
 
   def show
-    user = User.find(params[:id])
+    @user = User.find(params[:id])
+    @timerposts = @user.timerposts.paginate(page: params[:page])
+
     # debugger
   end
 
@@ -63,14 +65,14 @@ class UsersController < ApplicationController
 
     # beforeアクション
 
-    # ログイン済みユーザーかどうか検証
-    def logged_in_user
-      unless logged_in?
-        store_location
-        flash[:danger] = "please log in."
-        redirect_to login_url
-      end
-    end
+    # # ログイン済みユーザーかどうか検証
+    # def logged_in_user
+    #   unless logged_in?
+    #     store_location
+    #     flash[:danger] = "please log in."
+    #     redirect_to login_url
+    #   end
+    # end
 
     def correct_user
       @user = User.find(params[:id])

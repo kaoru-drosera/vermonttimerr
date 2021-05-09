@@ -80,4 +80,12 @@ class UserTest < ActiveSupport::TestCase
     assert_not @user.authenticated?('')
   end
 
+  test "associated timerpost should be deleted" do
+    @user.save
+    @user.timerposts.create!(hour:1, minutes:1, second:1, memo:"Lorem ipsum")
+    assert_difference 'Timerpost.count', -1 do
+      @user.destroy
+    end
+  end
+
 end

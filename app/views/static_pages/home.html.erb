@@ -1,7 +1,22 @@
 <% provide(:title, "Home") %>
 <h1>StaticPages#hme</h1>
 <p>Find me in app/views/static_pages/home.html.erb</p>
-<p><%= link_to "Sign up now!", signup_path %></p>
+
+<% if logged_in? %>
+  <div class="row">
+    <aside class="col-md-4">
+      <section class="user_info"><%= render 'shared/user_info' %></section><!--  .user_info -->
+      <section class="timerpost_form"><%= render 'shared/timerpost_form' %></section><!--  .timerpost_form -->
+    </aside><!--  .col-md-4 -->
+    <div class="col-md-8">
+      <h3>timerpost feed</h3>
+      <% render 'shared/feed'%>
+    </div><!--  .col-md-8 -->
+  </div><!--  .row -->
+<% else %>
+  <p><%= link_to "Sign up now!", signup_path %></p>
+<% end %>
+
 
 <div>
   <span id="timespan">
@@ -16,9 +31,9 @@
 
 <script type="text/javascript">
 
-  hour = 0 * 60 * 60;
-  min = 1 * 60;
-  sec = 9;
+  hour = <%= 0 %> * 60 * 60;
+  min = <%= 1 %> * 60;
+  sec = <%= 9 %>;
 
   var CCOUNT = hour + min + sec;
   console.log(CCOUNT);
@@ -59,11 +74,7 @@
   // }
 
 
-
-  function load(){
-    cdreset();
-    // document.getElementById('hourspan').innerHTML = count;
-
+  function msgBoard(){
     var dHour = Math.floor(count % (24 * 60 * 60) / (60 * 60));
     var dMin = Math.floor(count % (24 * 60 * 60) % (60 * 60) / 60);
     var dSec = count % (24 * 60 * 60) % (60 * 60) % 60 % 60;
@@ -75,7 +86,14 @@
     document.getElementById('hourspan').innerHTML = dHour;
     document.getElementById('minspan').innerHTML = dMin;
     document.getElementById('secspan').innerHTML = dSec;
+  }
 
+
+  function load(){
+    cdreset();
+    // document.getElementById('hourspan').innerHTML = count;
+
+    msgBoard();
   }
 
 
@@ -83,23 +101,11 @@
    function cddisplay() {
        // displays time in span
 
-       var dHour = Math.floor(count % (24 * 60 * 60) / (60 * 60));
-       var dMin = Math.floor(count % (24 * 60 * 60) % (60 * 60) / 60);
-       var dSec = count % (24 * 60 * 60) % (60 * 60) % 60 % 60;
+      msgBoard();
 
-        (dHour < 10) ? dHour = "0" + dHour : dHour;
-        (dMin < 10) ? dMin = "0" + dMin : dMin;
-        (dSec < 10) ? dSec = "0" + dSec : dSec;
-
-       console.log(dHour);
-       console.log(dMin);
-       console.log(dSec);
-
-       // document.getElementById('hourspan').innerHTML = count;
-       document.getElementById('hourspan').innerHTML = dHour;
-       document.getElementById('minspan').innerHTML = dMin;
-       document.getElementById('secspan').innerHTML = dSec;
-
+       // console.log(dHour);
+       // console.log(dMin);
+       // console.log(dSec);
 
    };
 
@@ -108,7 +114,8 @@
        cddisplay();
        if (count == 0) {
            // time is up
-           document.getElementById("startbtn").disabled = false;
+           document.getElementById("startbtn").disabled = true;
+           document.getElementById("stopbtn").disabled = true;
        } else {
            document.getElementById("startbtn").disabled = true;
            document.getElementById("stopbtn").disabled = false;
