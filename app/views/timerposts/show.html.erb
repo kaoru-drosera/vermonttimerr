@@ -25,9 +25,9 @@
 
 <script type="text/javascript">
 
-  hour = <%= timerpost.hour %> * 60 * 60;
-  min = <%= timerpost.minutes %> * 60;
-  sec = <%= timerpost.second %>;
+  hour = <%= @timerpost.hour %> * 60 * 60;
+  min = <%= @timerpost.minutes %> * 60;
+  sec = <%= @timerpost.second %>;
 
   var CCOUNT = hour + min + sec;
   console.log(CCOUNT);
