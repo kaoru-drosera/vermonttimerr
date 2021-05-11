@@ -11,3 +11,129 @@
     <span><%= @timerpost.memo %></span>
   </section><!--  .user_info -->
 </aside><!--  .col-md-4 -->
+
+<div>
+  <span id="timespan">
+    <span id="hourspan"></span> :
+    <span id="minspan"></span> :
+    <span id="secspan"></span>
+  </span>
+  <input id="startbtn" type="button" value="Start" onclick="countdown()">
+  <input id="stopbtn" type="button" value="Stop" onclick="cdpause()">
+  <input id="resetbtn" type="button" value="Reset" onclick="cdreset()">
+</div><!-- #cdreset  -->
+
+<script type="text/javascript">
+
+  hour = <%= timerpost.hour %> * 60 * 60;
+  min = <%= timerpost.minutes %> * 60;
+  sec = <%= timerpost.second %>;
+
+  var CCOUNT = hour + min + sec;
+  console.log(CCOUNT);
+
+  var t, count;
+
+
+  window.onload = load;
+
+
+
+  // // 時間・分・秒に書き換える
+  // var dHour = count % (1000 * 60 * 60);
+  // count = count / (1000 * 60 * 60);
+  // var dMin = count % (1000 * 60);
+  // count = count / (1000 * 60);
+  // var dSec = count / 1000;
+  //
+  // console.log(dHour);
+  // console.log(dMin);
+  // console.log(dSec);
+
+
+  // function set2fig(count){
+  //   // 数値が1桁の場合2桁にする
+  //   if(count < 10){
+  //     ret = "0" + count;
+  //   } else {
+  //     ret = count
+  //   }
+  //   return ret;
+  // }
+  //
+  // function isNumOrZero(count){
+  //   // 数値えない場合0にして返す
+  //   if(isNaN(count)){return 0;}
+  //   return count;
+  // }
+
+
+  function msgBoard(){
+    var dHour = Math.floor(count % (24 * 60 * 60) / (60 * 60));
+    var dMin = Math.floor(count % (24 * 60 * 60) % (60 * 60) / 60);
+    var dSec = count % (24 * 60 * 60) % (60 * 60) % 60 % 60;
+
+     (dHour < 10) ? dHour = "0" + dHour : dHour;
+     (dMin < 10) ? dMin = "0" + dMin : dMin;
+     (dSec < 10) ? dSec = "0" + dSec : dSec;
+
+    document.getElementById('hourspan').innerHTML = dHour;
+    document.getElementById('minspan').innerHTML = dMin;
+    document.getElementById('secspan').innerHTML = dSec;
+  }
+
+
+  function load(){
+    cdreset();
+    // document.getElementById('hourspan').innerHTML = count;
+
+    msgBoard();
+  }
+
+
+
+   function cddisplay() {
+       // displays time in span
+
+      msgBoard();
+
+       // console.log(dHour);
+       // console.log(dMin);
+       // console.log(dSec);
+
+   };
+
+   function countdown() {
+       // starts countdown
+       cddisplay();
+       if (count == 0) {
+           // time is up
+           document.getElementById("startbtn").disabled = true;
+           document.getElementById("stopbtn").disabled = true;
+       } else {
+           document.getElementById("startbtn").disabled = true;
+           document.getElementById("stopbtn").disabled = false;
+
+           count--;
+           t = setTimeout("countdown()", 1000);
+       }
+   };
+
+   function cdpause() {
+       // pauses countdown
+       clearTimeout(t);
+       document.getElementById("startbtn").disabled = false;
+       document.getElementById("stopbtn").disabled = true;
+
+   };
+
+   function cdreset() {
+       // resets countdown
+       cdpause();
+       count = CCOUNT;
+       cddisplay();
+       document.getElementById("startbtn").disabled = false;
+   };
+
+
+</script>
