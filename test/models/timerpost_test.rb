@@ -5,7 +5,7 @@ class TimerpostTest < ActiveSupport::TestCase
   def setup
     @user = users(:michael)
     # @number = Faker::Number.leading_zero_number(digits: 3)
-    @timerpost = @user.timerposts.build(hour:1, minutes:1, second:1, memo:"Lorem ipsum")
+    @timerpost = @user.timerposts.build(hour:1, minutes:1, second:1, memo:"Lorem ipsum", title:"title")
   end
 
   test "should be valid" do

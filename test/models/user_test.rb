@@ -82,7 +82,7 @@ class UserTest < ActiveSupport::TestCase
 
   test "associated timerpost should be deleted" do
     @user.save
-    @user.timerposts.create!(hour:1, minutes:1, second:1, memo:"Lorem ipsum")
+    @user.timerposts.create!(hour:1, minutes:1, second:1, memo:"Lorem ipsum", title:"title")
     assert_difference 'Timerpost.count', -1 do
       @user.destroy
     end

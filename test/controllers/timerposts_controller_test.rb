@@ -8,7 +8,7 @@ class TimerpostsControllerTest < ActionDispatch::IntegrationTest
 
   test "should redirect create when not logged in" do
     assert_no_difference 'Timerpost.count' do
-      post timerposts_path, params:{timerpost:{hour: 0, minutes:1, second: 30}}
+      post timerposts_path, params:{timerpost:{hour: 0, minutes:1, second: 30, memo:"memo", title:"title"}}
     end
     assert_redirected_to login_url
   end

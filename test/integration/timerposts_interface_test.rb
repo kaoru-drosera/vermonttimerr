@@ -14,7 +14,7 @@ class TimerpostsInterfaceTest < ActionDispatch::IntegrationTest
 
     # 無効な送信
     assert_no_difference 'Timerpost.count' do
-      post timerposts_path, params:{timerpost:{hour:"", minutes:"", second:"", memo:""}}
+      post timerposts_path, params:{timerpost:{hour:"", minutes:"", second:"", memo:"", title:""}}
     end
     assert_select 'div#error_explanation'
     assert_select 'a[href=?]','/?page=2'
@@ -23,9 +23,10 @@ class TimerpostsInterfaceTest < ActionDispatch::IntegrationTest
     hour = 1;
     minutes = 1;
     second = 1;
-    memo = "this is timerpostTest"
+    memo = "this is timerpostTest_memo"
+    title = "timerpostTest"
     assert_difference 'Timerpost.count', 1 do
-      post timerposts_path, params:{timerpost:{hour:hour, minutes:minutes, second:second, memo:memo}}
+      post timerposts_path, params:{timerpost:{hour:hour, minutes:minutes, second:second, memo:memo, title:title}}
     end
     assert_redirected_to root_url
     follow_redirect!
@@ -61,7 +62,7 @@ class TimerpostsInterfaceTest < ActionDispatch::IntegrationTest
     log_in_as(other_user)
     get root_path
     assert_match "0 timerposts", response.body
-    other_user.timerposts.create!(hour: 1, minutes: 1, second: 1, memo:"A memo")
+    other_user.timerposts.create!(hour: 1, minutes: 1, second: 1, memo:"A memo", title:"title")
     get root_path
     assert_match "1 timerpost", response.body
   end
