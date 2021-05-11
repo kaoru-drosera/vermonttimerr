@@ -6,4 +6,5 @@ class Timerpost < ApplicationRecord
   validates :minutes, presence:true, length:{maximum: 2}, numericality: {greater_than_or_equal_to: 0, less_than: 60}
   validates :second, presence:true, length:{maximum: 2}, numericality: {greater_than_or_equal_to: 0, less_than: 60}
   validates :memo, length:{maximum: 140}
+  validates :title, presence:true, length:{maximum: 50}
 end

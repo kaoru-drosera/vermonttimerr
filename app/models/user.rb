@@ -43,11 +43,12 @@ class User < ApplicationRecord
     update_attribute(:remember_digest,nil)
   end
 
+  def feed
+    Timerpost.where('user_id = ?',id)
+  end
+
   private
 
-    def feed
-      Timerpost.where('user_id = ?',:id)
-    end
 
 
 end

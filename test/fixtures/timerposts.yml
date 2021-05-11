@@ -4,7 +4,8 @@ one:
   hour: 1
   minutes: 1
   second: 1
-  memo: "Timer 1"
+  memo: "this is Timer 1"
+  title: "Timer 1"
   created_at: <%= 10.minutes.ago %>
   user: michael
 
@@ -12,7 +13,8 @@ two_most_secent:
   hour: 1
   minutes: 1
   second: 1
-  memo: "this is Timer 2"
+  memo: "this is Timer 2, so what"
+  title: "this is Timer 2"
   created_at: <%= Time.zone.now %>
   user: michael
 
@@ -20,7 +22,8 @@ three:
   hour: 0
   minutes: 1
   second: 1
-  memo: "this is Timer 3"
+  memo: "this is Timer 3, so what"
+  title: "this is Timer 3"
   created_at: <%= 3.years.ago %>
   user: michael
 
@@ -28,7 +31,8 @@ four:
   hour: 1
   minutes: 0
   second: 1
-  memo: "this is Timer 4"
+  memo: "this is Timer 4, so what"
+  title: "this is Timer 4"
   created_at: <%= 2.hours.ago %>
   user: michael
 
@@ -37,7 +41,8 @@ timerpost_<%= n %>:
   hour: <%= Faker::Number.between(from:0, to:59) %>
   minutes: <%= Faker::Number.between(from:0, to:59) %>
   second: <%= Faker::Number.between(from:0, to:59) %>
-  memo: "this is memo <%= n %>"
+  memo: "this is memo <%= n %>, so what"
+  title: "this is memo <%= n %>"
   created_at: <%= 42.days.ago %>
   user: michael
 <% end %>
@@ -47,7 +52,8 @@ five:
   hour: 1
   minutes: 1
   second: 0
-  memo: "Timer 5"
+  memo: "Timer 5, so what"
+  title: "Timer 5"
   created_at: <%= 10.minutes.ago %>
   user: archer
 
@@ -55,7 +61,8 @@ six:
   hour: 0
   minutes: 1
   second: 1
-  memo: "this is Timer 6"
+  memo: "this is Timer 6, so what"
+  title: "this is Timer 6"
   created_at: <%= 35.minutes.ago %>
   user: archer
 
@@ -63,7 +70,8 @@ seven_most_recent:
   hour: 0
   minutes: 1
   second: 0
-  memo: "this is Timer 7"
+  memo: "this is Timer 7, so what"
+  title: "this is Timer 7"
   created_at: <%= Time.zone.now %>
   user: lana
 
@@ -71,6 +79,7 @@ eight:
   hour: 1
   minutes: 0
   second: 0
-  memo: "this is Timer 8"
+  memo: "this is Timer 8, so what"
+  title: "this is Timer 8"
   created_at: <%= 2.hours.ago %>
   user: lana

@@ -15,5 +15,5 @@ Rails.application.routes.draw do
   resources :users
   # resources :users
   # resources :users
-  resources :timerposts, only:[:create, :destroy]
+  resources :timerposts, only:[:create, :destroy, :show]
 end

@@ -1,4 +1,5 @@
 <li id="timerpost-<%= timerpost.id %>">
+  <h3><%= timerpost.title %></h3>
   <span class="user"><%= link_to timerpost.user.name, timerpost.user %></span>
   <span class="hour"><%= timerpost.hour %></span>
   <span class="minutes"><%= timerpost.minutes %></span>
@@ -8,4 +9,5 @@
   <% if current_user?(timerpost.user) %>
     <%= link_to "delete", timerpost, method: :delete, data:{confirm:"you sure?"} %>
   <% end %>
+  <%= link_to "read more", timerpost %>
 </li><!-- #micropost-  -->

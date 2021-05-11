@@ -3,12 +3,12 @@ class TimerpostsController < ApplicationController
   before_action :correct_user, only:[:destroy]
 
   def create
-    @timerpost = current_user.timerposts.bulid(timerpost_params)
+    @timerpost = current_user.timerposts.build(timerpost_params)
     if @timerpost.save
       flash[:success] = "Timerpost created"
       redirect_to root_url
     else
-      @feed_items = current_user.feed.paginate(page: params:[:page])
+      @feed_items = current_user.feed.paginate(page: params[:page])
       render 'static_pages/home'
     end
   end
@@ -19,10 +19,14 @@ class TimerpostsController < ApplicationController
     redirect_to request.referrer || root_url
   end
 
+  def show
+    @timerpost = Timerpost.find(params[:id])
+  end
+
   private
 
     def timerpost_params
-      params.requite(:timerpost).permit(:hour, :minutes, :second)
+      params.require(:timerpost).permit(:hour, :minutes, :second, :memo, :title)
     end
 
     def correct_user

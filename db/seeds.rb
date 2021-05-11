@@ -15,7 +15,9 @@ users = User.order(:created_at).take(6)
   hour = Faker::Number.between(from:0, to:59)
   minutes = Faker::Number.between(from:0, to:59)
   second = Faker::Number.between(from:0, to:59)
-  users.each{|user| user.timerposts.create!(hour: hour, minutes: minutes, second: second)}
+  memo = Faker::Lorem.sentence(word_count: 5)
+  title = Faker::Name.name
+  users.each{|user| user.timerposts.create!(hour: hour, minutes: minutes, second: second, memo: memo, title: title)}
 end
 
 
